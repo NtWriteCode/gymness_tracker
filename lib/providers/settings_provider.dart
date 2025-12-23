@@ -11,12 +11,14 @@ enum AppThemeMode {
 class SettingsProvider with ChangeNotifier {
   static const String _themeKey = 'theme_mode';
   static const String _gpsRadiusKey = 'gps_radius';
+  static const String _weightKey = 'user_weight';
 
   final SharedPreferences _prefs;
 
-  // Default to dynamic (Material You / System)
-  late AppThemeMode _currentTheme;
-  late double _gpsRadius;
+  // Default values
+  AppThemeMode _currentTheme = AppThemeMode.dynamic;
+  double _gpsRadius = 50.0;
+  double _userWeightKg = 75.0;
 
   SettingsProvider(this._prefs) {
     _loadSettings();
@@ -24,6 +26,7 @@ class SettingsProvider with ChangeNotifier {
 
   AppThemeMode get currentTheme => _currentTheme;
   double get gpsRadius => _gpsRadius;
+  double get userWeightKg => _userWeightKg;
 
   void _loadSettings() {
     final themeIndex = _prefs.getInt(_themeKey) ?? AppThemeMode.dynamic.index;
@@ -35,6 +38,7 @@ class SettingsProvider with ChangeNotifier {
     }
     
     _gpsRadius = _prefs.getDouble(_gpsRadiusKey) ?? 50.0;
+    _userWeightKg = _prefs.getDouble(_weightKey) ?? 75.0;
   }
 
   Future<void> setTheme(AppThemeMode mode) async {
@@ -48,4 +52,11 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
     await _prefs.setDouble(_gpsRadiusKey, radius);
   }
+
+  Future<void> setUserWeight(double weight) async {
+    _userWeightKg = weight;
+    notifyListeners();
+    await _prefs.setDouble(_weightKey, weight);
+  }
+
 }

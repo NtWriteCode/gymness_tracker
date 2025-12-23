@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
+import '../providers/workout_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -94,6 +95,66 @@ class SettingsScreen extends StatelessWidget {
                       settings.setGpsRadius(value);
                     },
                   ),
+                ),
+              ],
+            );
+          },
+        ),
+        const Divider(),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            'Debug & Data',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        ),
+        Consumer<WorkoutProvider>(
+          builder: (context, provider, _) {
+            return Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.auto_awesome),
+                  title: const Text('Generate Realistic Data'),
+                  subtitle: const Text('25 workouts spread over 6 months with streaks'),
+                  onTap: () async {
+                     await provider.clearAllHistory();
+                     await provider.debugGenerateRandomHistory();
+                     if (context.mounted) {
+                       ScaffoldMessenger.of(context).showSnackBar(
+                         const SnackBar(content: Text('Realistic data generated!')),
+                       );
+                     }
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.delete_forever, color: Theme.of(context).colorScheme.error),
+                  title: Text(
+                    'Nuclear Reset',
+                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                  ),
+                  subtitle: const Text('Wipes ALL workouts, exercises and achievements'),
+                  onTap: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Nuclear Reset?'),
+                        content: const Text('This will permanently delete everything. History, exercises, achievements... gone.'),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text('Reset', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
+                      await provider.clearAllHistory();
+                    }
+                  },
                 ),
               ],
             );

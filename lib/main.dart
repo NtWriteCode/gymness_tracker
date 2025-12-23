@@ -7,6 +7,7 @@ import 'screens/workout_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/profile_screen.dart';
 import 'providers/settings_provider.dart';
 import 'providers/workout_provider.dart';
 import 'theme/app_theme.dart';
@@ -19,7 +20,11 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SettingsProvider(prefs)),
-        ChangeNotifierProvider(create: (_) => WorkoutProvider(prefs)),
+        ChangeNotifierProxyProvider<SettingsProvider, WorkoutProvider>(
+          create: (_) => WorkoutProvider(prefs),
+          update: (_, settings, workout) =>
+              workout!..updateWeight(settings.userWeightKg),
+        ),
       ],
       child: const GymnessTrackerApp(),
     ),
@@ -36,7 +41,7 @@ class GymnessTrackerApp extends StatelessWidget {
         return Consumer<SettingsProvider>(
           builder: (context, settings, child) {
             return MaterialApp(
-              title: 'Gymness Tracker',
+              title: 'Gymness',
               theme: AppTheme.getLight(
                 settings.currentTheme == AppThemeMode.dynamic ? lightDynamic : null,
               ),
@@ -69,7 +74,24 @@ class _HomeScaffoldState extends State<HomeScaffold> {
     HistoryScreen(),
     StatsScreen(),
     SettingsScreen(),
+    ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for requests to jump to history
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<WorkoutProvider>(context, listen: false);
+      provider.addListener(() {
+        if (provider.highlightedWorkoutId != null && _selectedIndex != 1) {
+          setState(() {
+            _selectedIndex = 1;
+          });
+        }
+      });
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -101,6 +123,10 @@ class _HomeScaffoldState extends State<HomeScaffold> {
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
         currentIndex: _selectedIndex,
