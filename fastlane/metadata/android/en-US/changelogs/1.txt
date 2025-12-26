@@ -1,0 +1,6 @@
+Initial release of Gymness Tracker!
+- Track gym and cardio workouts.
+- Support for over 50 achievements.
+- Workout stats and charts.
+- Custom workout templates.
+- Clean Material Design interface.

@@ -1,0 +1,20 @@
+Gymness Tracker is your premium personal fitness companion, meticulously designed to track both gym and cardio workouts with precision and style. 
+
+Whether you're a powerlifter, a marathon runner, or just starting your fitness journey, Gymness Tracker provides the tools you need to succeed.
+
+### 🚀 Key Features:
+- **Comprehensive Tracking:** Log gym exercises with sets, reps, and weights. Track cardio sessions with distance, duration, and pace.
+- **Dynamic Stats:** Visualize your progress with advanced charts and detailed statistics.
+- **Achievement System:** Unlock over 50 unique achievements across categories like Power, Consistency, and Secret challenges!
+- **Workout Templates:** Save your favorite routines for quick access and consistent training.
+- **Material Design:** A clean, modern, and intuitive interface that stays out of your way.
+- **Privacy First:** Your data stays on your device.
+
+### 🏆 Unlock Epic Achievements:
+- **Human Forklift:** Lift a total of 10,000kg across your history.
+- **Road Warrior:** Reach 50km total lifetime cardio distance.
+- **Beast Mode:** Lift more than 10x your bodyweight in total volume.
+- **Monday Motivator:** Prove your dedication by working out 4 Mondays in a row.
+- ...and many more secret challenges to discover!
+
+Level up your fitness game with Gymness Tracker – where every rep counts!
