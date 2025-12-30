@@ -263,12 +263,15 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
                           final workoutCopy = workoutProvider.activeWorkout;
                           if (workoutCopy == null) return;
                           
-                          await workoutProvider.finishWorkout();
+                          final newAchievements = await workoutProvider.finishWorkout();
                           
                           if (context.mounted) {
                             await showDialog(
                               context: context,
-                              builder: (context) => WorkoutSummaryDialog(workout: workoutCopy),
+                              builder: (context) => WorkoutSummaryDialog(
+                                workout: workoutCopy,
+                                newAchievements: newAchievements,
+                              ),
                             );
                             navigator.pop();
                           }

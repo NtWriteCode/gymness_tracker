@@ -227,8 +227,8 @@ class WorkoutProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> finishWorkout() async {
-    if (_activeWorkout == null) return;
+  Future<List<String>> finishWorkout() async {
+    if (_activeWorkout == null) return [];
     
     final finishedWorkout = _activeWorkout!.copyWith(
       isFinished: true,
@@ -240,8 +240,15 @@ class WorkoutProvider with ChangeNotifier {
     
     await _prefs.remove(_activeWorkoutKey);
     await _saveHistory();
+
+    final preAchievements = Set<String>.from(_earnedAchievements.keys);
     await checkAchievements();
+    final postAchievements = Set<String>.from(_earnedAchievements.keys);
+
+    final newIds = postAchievements.difference(preAchievements).toList();
+    
     notifyListeners();
+    return newIds;
   }
 
   Future<void> saveAsTemplate(Workout workout, String name) async {
