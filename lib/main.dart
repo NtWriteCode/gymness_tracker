@@ -23,7 +23,7 @@ void main() async {
         ChangeNotifierProxyProvider<SettingsProvider, WorkoutProvider>(
           create: (_) => WorkoutProvider(prefs),
           update: (_, settings, workout) =>
-              workout!..updateWeight(settings.userWeightKg),
+              workout!..updateDemographics(weight: settings.userWeightKg),
         ),
       ],
       child: const GymnessTrackerApp(),

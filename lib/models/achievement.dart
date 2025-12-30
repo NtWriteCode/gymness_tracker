@@ -556,4 +556,40 @@ const List<Achievement> allAchievements = [
     icon: Icons.map,
     category: AchievementCategory.power,
   ),
+  // Intensity Achievements (5)
+  Achievement(
+    id: 'taking_it_easy',
+    title: 'Taking it Easy',
+    description: 'Complete 5 workouts with RPE 3 or lower.',
+    icon: Icons.spa,
+    category: AchievementCategory.consistency,
+  ),
+  Achievement(
+    id: 'the_daily_grind',
+    title: 'The Daily Grind',
+    description: 'Complete 10 workouts with RPE between 5 and 7.',
+    icon: Icons.work_history,
+    category: AchievementCategory.consistency,
+  ),
+  Achievement(
+    id: 'beast_mode_on',
+    title: 'Beast Mode: ON',
+    description: 'Complete your first workout with RPE 10.',
+    icon: Icons.bolt,
+    category: AchievementCategory.power,
+  ),
+  Achievement(
+    id: 'absolute_madman',
+    title: 'Absolute Madman',
+    description: 'Complete 10 workouts with RPE 10.',
+    icon: Icons.whatshot,
+    category: AchievementCategory.power,
+  ),
+  Achievement(
+    id: 'perfect_balance',
+    title: 'Perfect Balance',
+    description: 'Complete a workout with RPE 1, 5, and 10 in your history (at some point).',
+    icon: Icons.balance,
+    category: AchievementCategory.wholesome,
+  ),
 ];

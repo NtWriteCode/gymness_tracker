@@ -614,7 +614,42 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
                                   fontStyle: FontStyle.italic,
                                 ),
                           ),
+                        )
+                      else ...[
+                        const Divider(height: 32),
+                        Row(
+                          children: [
+                            const Icon(Icons.speed, size: 20, color: Colors.grey),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Workout Intensity',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 8),
+                        Slider(
+                          value: workout.rpe.toDouble(),
+                          min: 1,
+                          max: 10,
+                          divisions: 9,
+                          label: workout.rpe.toString(),
+                          onChanged: (val) {
+                            workoutProvider.updateRPE(val.toInt());
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Light', style: Theme.of(context).textTheme.bodySmall),
+                              Text('Moderate', style: Theme.of(context).textTheme.bodySmall),
+                              Text('Max Effort', style: Theme.of(context).textTheme.bodySmall),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

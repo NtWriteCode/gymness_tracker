@@ -12,6 +12,9 @@ class SettingsProvider with ChangeNotifier {
   static const String _themeKey = 'theme_mode';
   static const String _gpsRadiusKey = 'gps_radius';
   static const String _weightKey = 'user_weight';
+  static const String _ageKey = 'user_age';
+  static const String _heightKey = 'user_height';
+  static const String _sexKey = 'user_sex';
 
   final SharedPreferences _prefs;
 
@@ -19,6 +22,9 @@ class SettingsProvider with ChangeNotifier {
   AppThemeMode _currentTheme = AppThemeMode.dynamic;
   double _gpsRadius = 50.0;
   double _userWeightKg = 75.0;
+  int _userAge = 30;
+  double _userHeightCm = 175.0;
+  String _userSex = 'male'; // 'male', 'female', 'apache helicopter'
 
   SettingsProvider(this._prefs) {
     _loadSettings();
@@ -27,6 +33,9 @@ class SettingsProvider with ChangeNotifier {
   AppThemeMode get currentTheme => _currentTheme;
   double get gpsRadius => _gpsRadius;
   double get userWeightKg => _userWeightKg;
+  int get userAge => _userAge;
+  double get userHeightCm => _userHeightCm;
+  String get userSex => _userSex;
 
   void _loadSettings() {
     final themeIndex = _prefs.getInt(_themeKey) ?? AppThemeMode.dynamic.index;
@@ -39,6 +48,9 @@ class SettingsProvider with ChangeNotifier {
     
     _gpsRadius = _prefs.getDouble(_gpsRadiusKey) ?? 50.0;
     _userWeightKg = _prefs.getDouble(_weightKey) ?? 75.0;
+    _userAge = _prefs.getInt(_ageKey) ?? 30;
+    _userHeightCm = _prefs.getDouble(_heightKey) ?? 175.0;
+    _userSex = _prefs.getString(_sexKey) ?? 'male';
   }
 
   Future<void> setTheme(AppThemeMode mode) async {
@@ -57,6 +69,24 @@ class SettingsProvider with ChangeNotifier {
     _userWeightKg = weight;
     notifyListeners();
     await _prefs.setDouble(_weightKey, weight);
+  }
+
+  Future<void> setUserAge(int age) async {
+    _userAge = age;
+    notifyListeners();
+    await _prefs.setInt(_ageKey, age);
+  }
+
+  Future<void> setUserHeight(double height) async {
+    _userHeightCm = height;
+    notifyListeners();
+    await _prefs.setDouble(_heightKey, height);
+  }
+
+  Future<void> setUserSex(String sex) async {
+    _userSex = sex;
+    notifyListeners();
+    await _prefs.setString(_sexKey, sex);
   }
 
 }

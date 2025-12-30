@@ -18,7 +18,7 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 24),
         _buildSectionHeader(context, 'Vital Stats'),
         const SizedBox(height: 16),
-        _buildWeightTrackingCard(context),
+        _buildDemographicsCard(context),
         const SizedBox(height: 32),
         _buildSectionHeader(context, 'Achievements'),
         const SizedBox(height: 16),
@@ -228,63 +228,132 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWeightTrackingCard(BuildContext context) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settings, _) {
+  Widget _buildDemographicsCard(BuildContext context) {
+    return Consumer2<SettingsProvider, WorkoutProvider>(
+      builder: (context, settings, workout, _) {
         return Card(
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            leading: const Icon(Icons.monitor_weight_outlined, size: 30),
-            title: const Text('Current Weight'),
-            subtitle: const Text('Used for accurate calorie calculation'),
-            trailing: Text(
-              '${settings.userWeightKg} kg',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-            onTap: () async {
-              final controller = TextEditingController(text: settings.userWeightKg.toString());
-              final result = await showDialog<String>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Edit Body Weight'),
-                  content: TextField(
-                    controller: controller,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(
-                      labelText: 'Weight (kg)',
-                      suffixText: 'kg',
-                      border: OutlineInputBorder(),
-                    ),
-                    autofocus: true,
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, controller.text),
-                      child: const Text('Save'),
-                    ),
-                  ],
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _buildDemoRow(
+                  context, 
+                  'Weight', 
+                  '${settings.userWeightKg} kg', 
+                  Icons.monitor_weight_outlined,
+                  () => _editDemographic(context, 'Weight', settings.userWeightKg.toString(), (val) {
+                    final weight = double.tryParse(val) ?? 75.0;
+                    settings.setUserWeight(weight);
+                    workout.updateDemographics(weight: weight);
+                  }),
                 ),
-              );
-              if (result != null) {
-                final weight = double.tryParse(result);
-                if (weight != null) {
-                  settings.setUserWeight(weight);
-                }
-              }
-            },
+                const Divider(height: 24),
+                _buildDemoRow(
+                  context, 
+                  'Height', 
+                  '${settings.userHeightCm} cm', 
+                  Icons.height,
+                  () => _editDemographic(context, 'Height', settings.userHeightCm.toString(), (val) {
+                    final height = double.tryParse(val) ?? 175.0;
+                    settings.setUserHeight(height);
+                    workout.updateDemographics(height: height);
+                  }),
+                ),
+                const Divider(height: 24),
+                _buildDemoRow(
+                  context, 
+                  'Age', 
+                  '${settings.userAge} years', 
+                  Icons.cake_outlined,
+                  () => _editDemographic(context, 'Age', settings.userAge.toString(), (val) {
+                    final age = int.tryParse(val) ?? 30;
+                    settings.setUserAge(age);
+                    workout.updateDemographics(age: age);
+                  }),
+                ),
+                const Divider(height: 24),
+                _buildDemoRow(
+                  context, 
+                  'Sex', 
+                  settings.userSex.toUpperCase(), 
+                  Icons.person_outline,
+                  () => _showSexDialog(context, settings, workout),
+                ),
+              ],
+            ),
           ),
         );
       },
     );
+  }
+
+  Widget _buildDemoRow(BuildContext context, String label, String value, IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Icon(icon, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 16),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+            const Spacer(),
+            Text(
+              value, 
+              style: TextStyle(
+                fontWeight: FontWeight.bold, 
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.chevron_right, size: 16, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _editDemographic(BuildContext context, String title, String current, Function(String) onSave) async {
+    final controller = TextEditingController(text: current);
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Edit $title'),
+        content: TextField(
+          controller: controller,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+            labelText: title,
+            border: const OutlineInputBorder(),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, controller.text), child: const Text('Save')),
+        ],
+      ),
+    );
+    if (result != null) onSave(result);
+  }
+
+  Future<void> _showSexDialog(BuildContext context, SettingsProvider settings, WorkoutProvider workout) async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Select Sex'),
+        children: ['male', 'female', 'apache helicopter'].map((s) => SimpleDialogOption(
+          onPressed: () => Navigator.pop(context, s),
+          child: Text(s.toUpperCase()),
+        )).toList(),
+      ),
+    );
+    if (result != null) {
+      settings.setUserSex(result);
+      workout.updateDemographics(sex: result);
+    }
   }
 
 }

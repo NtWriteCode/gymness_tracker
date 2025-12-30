@@ -52,10 +52,18 @@ class _EditExerciseDialogState extends State<EditExerciseDialog> {
   void dispose() {
     _stopwatch?.cancel();
     _nameController.dispose();
-    for (var c in _weightControllers) c.dispose();
-    for (var c in _repsControllers) c.dispose();
-    for (var c in _distanceControllers) c.dispose();
-    for (var c in _durationSetControllers) c.dispose();
+    for (var c in _weightControllers) {
+      c.dispose();
+    }
+    for (var c in _repsControllers) {
+      c.dispose();
+    }
+    for (var c in _distanceControllers) {
+      c.dispose();
+    }
+    for (var c in _durationSetControllers) {
+      c.dispose();
+    }
     _durationController.dispose();
     super.dispose();
   }

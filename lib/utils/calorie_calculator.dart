@@ -16,41 +16,75 @@ class CalorieCalculator {
   static const double _restBetweenSets = 60.0; // Rest time between sets (seconds)
   
   /// Calculate total estimated calories for a list of exercises
-  static int calculateTotalCalories(List<Exercise> exercises, double userWeightKg) {
+  static int calculateTotalCalories(
+    List<Exercise> exercises, 
+    double userWeightKg, {
+    int age = 30,
+    double heightCm = 175.0,
+    String sex = 'male',
+    int rpe = 5,
+  }) {
     if (exercises.isEmpty) return 0;
     
     double totalCalories = 0.0;
     
     for (var exercise in exercises) {
-      totalCalories += _calculateExerciseCalories(exercise, userWeightKg);
+      totalCalories += _calculateExerciseCalories(
+        exercise, 
+        userWeightKg, 
+        age: age, 
+        heightCm: heightCm, 
+        sex: sex,
+      );
     }
+
+    // Apply RPE multiplier: RPE 5 is neutral (1.0)
+    // Formula: 0.5 + (rpe / 10)
+    // RPE 1 => 0.6x
+    // RPE 5 => 1.0x
+    // RPE 10 => 1.5x
+    final multiplier = 0.5 + (rpe / 10.0);
     
-    return totalCalories.round();
+    return (totalCalories * multiplier).round();
   }
   
   /// Calculate calories for a single exercise
-  static double _calculateExerciseCalories(Exercise exercise, double userWeightKg) {
+  static double _calculateExerciseCalories(
+    Exercise exercise, 
+    double userWeightKg, {
+    int age = 30,
+    double heightCm = 175.0,
+    String sex = 'male',
+  }) {
     if (exercise.sets.isEmpty) return 0.0;
+
+    // BMR using Mifflin-St Jeor Equation
+    double bmr;
+    if (sex.toLowerCase() == 'male') {
+      bmr = (10 * userWeightKg) + (6.25 * heightCm) - (5 * age) + 5;
+    } else if (sex.toLowerCase() == 'female') {
+      bmr = (10 * userWeightKg) + (6.25 * heightCm) - (5 * age) - 161;
+    } else {
+      // Average for 'other'
+      bmr = (10 * userWeightKg) + (6.25 * heightCm) - (5 * age) - 78;
+    }
+
+    // Calories burned per minute per MET = (BMR / 24 / 60) * MET
+    // This is more accurate than the generic (3.5 * weight) / 200
+    final caloriesPerMetMinute = bmr / (24 * 60);
 
     // If total duration is specified for the exercise, use that first
     if (exercise.durationMinutes > 0) {
-      // Find average weight used across all sets to determine an average MET
       final avgWeight = exercise.sets.map((s) => s.weightKg).reduce((a, b) => a + b) / exercise.sets.length;
-      return _calculateDurationBasedCalories(
-        exercise.durationMinutes,
-        avgWeight,
-        userWeightKg,
-      );
+      final met = _getMETFromWeight(avgWeight);
+      return met * caloriesPerMetMinute * exercise.durationMinutes;
     }
     
-    // Otherwise calculate total calories by summing the work and rest time for each set
     double weightedMETSum = 0;
-    final caloriesConstant = (3.5 * userWeightKg) / 200;
 
     for (int i = 0; i < exercise.sets.length; i++) {
       final set = exercise.sets[i];
       final setWorkTime = set.reps * _secondsPerRep;
-      // No rest after the very last set of the exercise
       final setRestTime = (i < exercise.sets.length - 1) ? _restBetweenSets : 0.0;
       final setTotalTimeMinutes = (setWorkTime + setRestTime) / 60.0;
       
@@ -58,19 +92,10 @@ class CalorieCalculator {
       weightedMETSum += met * setTotalTimeMinutes;
     }
     
-    return weightedMETSum * caloriesConstant;
+    return weightedMETSum * caloriesPerMetMinute;
   }
   
-  /// Calculate calories based on exercise duration
-  static double _calculateDurationBasedCalories(
-    int durationMinutes,
-    double exerciseWeightKg,
-    double userWeightKg,
-  ) {
-    final met = _getMETFromWeight(exerciseWeightKg);
-    final caloriesPerMinute = (met * 3.5 * userWeightKg) / 200;
-    return caloriesPerMinute * durationMinutes;
-  }
+  
   
   /// Determine MET value based on weight being lifted
   static double _getMETFromWeight(double weightKg) {

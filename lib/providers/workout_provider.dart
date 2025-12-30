@@ -27,6 +27,9 @@ class WorkoutProvider with ChangeNotifier {
   List<WorkoutTemplate> _templates = [];
   Set<String> _exerciseNames = {}; // For autocomplete
   double _userWeightKg = 75.0;
+  int _userAge = 30;
+  double _userHeightCm = 175.0;
+  String _userSex = 'male';
   Map<String, DateTime> _earnedAchievements = {};
   String? _highlightedWorkoutId;
   int _weightUpdateCount = 0;
@@ -45,13 +48,49 @@ class WorkoutProvider with ChangeNotifier {
   Map<String, DateTime> get earnedAchievements => _earnedAchievements;
   String? get highlightedWorkoutId => _highlightedWorkoutId;
 
-  void updateWeight(double weight) {
-    if (_userWeightKg == weight) return;
-    _userWeightKg = weight;
-    _weightUpdateCount++;
-    _prefs.setInt('weight_update_count', _weightUpdateCount);
+  Future<void> updateDemographics({double? weight, int? age, double? height, String? sex}) async {
+    bool changed = false;
+    if (weight != null && _userWeightKg != weight) {
+      _userWeightKg = weight;
+      _weightUpdateCount++;
+      _prefs.setInt('weight_update_count', _weightUpdateCount);
+      changed = true;
+    }
+    if (age != null && _userAge != age) {
+      _userAge = age;
+      changed = true;
+    }
+    if (height != null && _userHeightCm != height) {
+      _userHeightCm = height;
+      changed = true;
+    }
+    if (sex != null && _userSex != sex) {
+      _userSex = sex;
+      changed = true;
+    }
+
+    if (changed) {
+      if (weight != null) await _prefs.setDouble('user_weight', weight);
+      if (age != null) await _prefs.setInt('user_age', age);
+      if (height != null) await _prefs.setDouble('user_height', height);
+      if (sex != null) await _prefs.setString('user_sex', sex);
+
+      _recalculateCaloriesIfNeeded();
+      checkAchievements();
+      notifyListeners();
+    }
+  }
+
+  void updateHighlight(String? workoutId) {
+    _highlightedWorkoutId = workoutId;
+    notifyListeners();
+  }
+
+  void updateRPE(int rpe) {
+    if (_activeWorkout == null || _activeWorkout!.rpe == rpe) return;
+    _activeWorkout = _activeWorkout!.copyWith(rpe: rpe);
     _recalculateCaloriesIfNeeded();
-    checkAchievements();
+    _saveActiveWorkout();
     notifyListeners();
   }
   
@@ -118,6 +157,12 @@ class WorkoutProvider with ChangeNotifier {
     // Load metadata counts
     _weightUpdateCount = _prefs.getInt('weight_update_count') ?? 0;
     _manualCalorieOverrideCount = _prefs.getInt('manual_calorie_count') ?? 0;
+    
+    // Load demographics (sync with SettingsProvider keys)
+    _userWeightKg = _prefs.getDouble('user_weight') ?? 75.0;
+    _userAge = _prefs.getInt('user_age') ?? 30;
+    _userHeightCm = _prefs.getDouble('user_height') ?? 175.0;
+    _userSex = _prefs.getString('user_sex') ?? 'male';
 
     checkAchievements(); // Initial scan
     notifyListeners();
@@ -459,7 +504,14 @@ class WorkoutProvider with ChangeNotifier {
         .whereType<Exercise>()
         .toList();
 
-    final newCalories = CalorieCalculator.calculateTotalCalories(workoutExercises, _userWeightKg);
+    final newCalories = CalorieCalculator.calculateTotalCalories(
+      workoutExercises, 
+      _userWeightKg,
+      age: _userAge,
+      heightCm: _userHeightCm,
+      sex: _userSex,
+      rpe: workout.rpe,
+    );
     return workout.copyWith(estimatedCalories: newCalories);
   }
 
@@ -546,6 +598,11 @@ class WorkoutProvider with ChangeNotifier {
     int gapStreak = 0;
     int maxGapStreak = 0;
 
+    int rpe3OrLowerCount = 0;
+    int rpe5To7Count = 0;
+    int rpe10Count = 0;
+    Set<int> seenRpes = {};
+
     // Daily volume grouping and other per-workout stats
     for (final w in cronHistory) {
       final date = w.startDateTime;
@@ -623,6 +680,24 @@ class WorkoutProvider with ChangeNotifier {
       if (workout.exerciseIds.length >= 3 && duration > 0 && duration < 20) earn('the_quickie', date);
       if (duration >= 120) earn('is_this_a_marathon', date);
       if (volume > 0 && volume % 100 == 0) earn('mathematical', date);
+
+      // Intensity Logic
+      seenRpes.add(workout.rpe);
+      if (workout.rpe <= 3) {
+        rpe3OrLowerCount++;
+        if (rpe3OrLowerCount >= 5) earn('taking_it_easy', date);
+      } else if (workout.rpe >= 5 && workout.rpe <= 7) {
+        rpe5To7Count++;
+        if (rpe5To7Count >= 10) earn('the_daily_grind', date);
+      } else if (workout.rpe == 10) {
+        rpe10Count++;
+        earn('beast_mode_on', date);
+        if (rpe10Count >= 10) earn('absolute_madman', date);
+      }
+
+      if (seenRpes.contains(1) && seenRpes.contains(5) && seenRpes.contains(10)) {
+        earn('perfect_balance', date);
+      }
 
       // Secret Logic
       if (volume >= _userWeightKg * 10) earn('beast_mode', date);

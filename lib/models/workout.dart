@@ -8,6 +8,7 @@ class Workout {
   String? customTitle; // Optional custom title
   int? estimatedCalories; // Estimated calories burned
   bool isCaloriesManuallySet; // Whether user manually set calories
+  int rpe; // Rate of Perceived Exertion (1-10)
 
   Workout({
     required this.id,
@@ -19,6 +20,7 @@ class Workout {
     this.customTitle,
     this.estimatedCalories,
     this.isCaloriesManuallySet = false,
+    this.rpe = 5,
   }) : exerciseIds = exerciseIds ?? [];
 
   Map<String, dynamic> toJson() => {
@@ -31,6 +33,7 @@ class Workout {
         'customTitle': customTitle,
         'estimatedCalories': estimatedCalories,
         'isCaloriesManuallySet': isCaloriesManuallySet,
+        'rpe': rpe,
       };
 
   factory Workout.fromJson(Map<String, dynamic> json) => Workout(
@@ -47,6 +50,7 @@ class Workout {
         customTitle: json['customTitle'],
         estimatedCalories: json['estimatedCalories'],
         isCaloriesManuallySet: json['isCaloriesManuallySet'] ?? false,
+        rpe: json['rpe'] ?? 5,
       );
 
   Workout copyWith({
@@ -58,6 +62,7 @@ class Workout {
     String? customTitle,
     int? estimatedCalories,
     bool? isCaloriesManuallySet,
+    int? rpe,
   }) {
     return Workout(
       id: id,
@@ -69,6 +74,7 @@ class Workout {
       customTitle: customTitle ?? this.customTitle,
       estimatedCalories: estimatedCalories ?? this.estimatedCalories,
       isCaloriesManuallySet: isCaloriesManuallySet ?? this.isCaloriesManuallySet,
+      rpe: rpe ?? this.rpe,
     );
   }
 
