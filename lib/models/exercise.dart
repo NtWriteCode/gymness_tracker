@@ -46,17 +46,19 @@ class Exercise {
   final String id;
   final ExerciseType type;
   String name;
-  List<ExerciseSet> sets;
+  final List<ExerciseSet> sets;
+  bool isDoubleWeight;
 
   Exercise({
     required this.id,
     this.type = ExerciseType.gym,
     required this.name,
     required this.sets,
+    this.isDoubleWeight = false,
   });
 
-  double get totalWeightLifted => sets.fold(0, (sum, set) => sum + (set.reps * set.weightKg));
-  double get totalDistance => sets.fold(0, (sum, set) => sum + set.distanceKm);
+  double get totalWeightLifted => sets.fold(0.0, (sum, set) => sum + (set.reps * set.weightKg)) * (isDoubleWeight ? 2.0 : 1.0);
+  double get totalDistance => sets.fold(0.0, (sum, set) => sum + set.distanceKm);
   
   // Convenience getters for backwards compatibility or single-set logic if needed
   int get reps => sets.isNotEmpty ? sets.first.reps : 0;
@@ -69,6 +71,7 @@ class Exercise {
         'type': type.index,
         'name': name,
         'sets': sets.map((s) => s.toJson()).toList(),
+        'isDoubleWeight': isDoubleWeight,
       };
 
   factory Exercise.fromJson(Map<String, dynamic> json) {
@@ -79,6 +82,7 @@ class Exercise {
         type: ExerciseType.values[json['type'] ?? 0],
         name: json['name'],
         sets: setsJson.map((s) => ExerciseSet.fromJson(s)).toList(),
+        isDoubleWeight: json['isDoubleWeight'] ?? false,
       );
     } else {
       // Migrate old data structure
@@ -107,12 +111,14 @@ class Exercise {
     String? name,
     List<ExerciseSet>? sets,
     ExerciseType? type,
+    bool? isDoubleWeight,
   }) {
     return Exercise(
       id: id ?? this.id,
       type: type ?? this.type,
       name: name ?? this.name,
       sets: sets ?? this.sets.map((s) => s.copyWith()).toList(),
+      isDoubleWeight: isDoubleWeight ?? this.isDoubleWeight,
     );
   }
 }

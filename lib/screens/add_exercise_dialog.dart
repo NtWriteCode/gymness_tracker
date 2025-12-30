@@ -21,6 +21,7 @@ class _AddExerciseDialogState extends State<AddExerciseDialog> {
   final List<TextEditingController> _repsControllers = [TextEditingController(text: '1')];
   final List<TextEditingController> _distanceControllers = [TextEditingController(text: '')];
   final List<TextEditingController> _durationSetControllers = [TextEditingController(text: '')];
+  bool _isDoubleWeight = false;
 
   Timer? _stopwatch;
   int _elapsedSeconds = 0;
@@ -175,6 +176,17 @@ class _AddExerciseDialogState extends State<AddExerciseDialog> {
                     );
                   },
                 ),
+                if (_type == ExerciseType.gym) ...[
+                  const SizedBox(height: 8),
+                  FilterChip(
+                    label: const Text('x2 Weight (per hand)'),
+                    selected: _isDoubleWeight,
+                    onSelected: (val) => setState(() => _isDoubleWeight = val),
+                    selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                    checkmarkColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
                 const SizedBox(height: 16),
                 Expanded(
                   child: ListView.builder(
@@ -368,6 +380,7 @@ class _AddExerciseDialogState extends State<AddExerciseDialog> {
                             type: _type,
                             name: _nameController.text.trim(),
                             sets: totalSets,
+                            isDoubleWeight: _isDoubleWeight,
                           );
                           provider.addExerciseToWorkout(exercise);
                           Navigator.pop(context);

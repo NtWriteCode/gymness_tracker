@@ -22,6 +22,7 @@ class _EditExerciseDialogState extends State<EditExerciseDialog> {
   final List<TextEditingController> _repsControllers = [];
   final List<TextEditingController> _distanceControllers = [];
   final List<TextEditingController> _durationSetControllers = [];
+  late bool _isDoubleWeight;
 
   Timer? _stopwatch;
   int _elapsedSeconds = 0;
@@ -33,6 +34,7 @@ class _EditExerciseDialogState extends State<EditExerciseDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.exercise.name);
     _type = widget.exercise.type;
+    _isDoubleWeight = widget.exercise.isDoubleWeight;
     _sets = List.from(widget.exercise.sets);
     if (_sets.isEmpty) {
       _sets.add(ExerciseSet(reps: 1, weightKg: 0.0));
@@ -197,6 +199,17 @@ class _EditExerciseDialogState extends State<EditExerciseDialog> {
                     );
                   },
                 ),
+                if (_type == ExerciseType.gym) ...[
+                  const SizedBox(height: 8),
+                  FilterChip(
+                    label: const Text('x2 Weight (per hand)'),
+                    selected: _isDoubleWeight,
+                    onSelected: (val) => setState(() => _isDoubleWeight = val),
+                    selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                    checkmarkColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
                 const SizedBox(height: 16),
                 Expanded(
                   child: ListView.builder(
@@ -389,6 +402,7 @@ class _EditExerciseDialogState extends State<EditExerciseDialog> {
                             name: _nameController.text.trim(),
                             type: _type,
                             sets: totalSets,
+                            isDoubleWeight: _isDoubleWeight,
                           );
                           provider.updateExercise(updatedExercise);
                           Navigator.pop(context);

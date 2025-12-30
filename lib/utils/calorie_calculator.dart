@@ -75,7 +75,7 @@ class CalorieCalculator {
 
     // If total duration is specified for the exercise, use that first
     if (exercise.durationMinutes > 0) {
-      final avgWeight = exercise.sets.map((s) => s.weightKg).reduce((a, b) => a + b) / exercise.sets.length;
+      final avgWeight = (exercise.sets.map((s) => s.weightKg).reduce((a, b) => a + b) / exercise.sets.length) * (exercise.isDoubleWeight ? 2.0 : 1.0);
       final met = _getMETFromWeight(avgWeight);
       return met * caloriesPerMetMinute * exercise.durationMinutes;
     }
@@ -88,7 +88,7 @@ class CalorieCalculator {
       final setRestTime = (i < exercise.sets.length - 1) ? _restBetweenSets : 0.0;
       final setTotalTimeMinutes = (setWorkTime + setRestTime) / 60.0;
       
-      final met = _getMETFromWeight(set.weightKg);
+      final met = _getMETFromWeight(set.weightKg * (exercise.isDoubleWeight ? 2.0 : 1.0));
       weightedMETSum += met * setTotalTimeMinutes;
     }
     
