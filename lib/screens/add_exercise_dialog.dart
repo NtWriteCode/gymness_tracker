@@ -104,12 +104,60 @@ class _AddExerciseDialogState extends State<AddExerciseDialog> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
+  bool _hasUnsavedChanges() {
+    if (_nameController.text.trim().isNotEmpty) return true;
+    if (_sets.length > 1) return true;
+    if (_isDoubleWeight) return true;
+    if (_isTimerRunning || _elapsedSeconds > 0) return true;
+    
+    // Check if the first set has been modified
+    final firstWeight = _weightControllers[0].text.trim();
+    final firstReps = _repsControllers[0].text.trim();
+    if (firstWeight.isNotEmpty && firstWeight != '0') return true;
+    if (firstReps.isNotEmpty && firstReps != '1') return true;
+    
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.read<WorkoutProvider>();
     final exerciseNames = provider.exerciseNames;
 
-    return Dialog(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+        if (didPop) return;
+        
+        if (!_hasUnsavedChanges()) {
+          if (context.mounted) Navigator.pop(context);
+          return;
+        }
+        
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Discard changes?'),
+            content: const Text('You have entered exercise data. Do you want to discard it?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Keep editing'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('Discard'),
+              ),
+            ],
+          ),
+        );
+
+        if ((shouldPop ?? false) && context.mounted) {
+          Navigator.pop(context);
+        }
+      },
+      child: Dialog(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 500, maxHeight: MediaQuery.of(context).size.height * 0.8),
         child: Padding(
@@ -395,6 +443,7 @@ class _AddExerciseDialogState extends State<AddExerciseDialog> {
           ),
         ),
       ),
+    ),
     );
   }
 }
