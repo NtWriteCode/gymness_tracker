@@ -253,34 +253,6 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
                 ],
               ),
             ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: FilledButton(
-                  onPressed: workoutProvider.activeWorkoutExercises.isNotEmpty
-                      ? () async {
-                          final navigator = Navigator.of(context);
-                          final workoutCopy = workoutProvider.activeWorkout;
-                          if (workoutCopy == null) return;
-                          
-                          final newAchievements = await workoutProvider.finishWorkout();
-                          
-                          if (context.mounted) {
-                            await showDialog(
-                              context: context,
-                              builder: (context) => WorkoutSummaryDialog(
-                                workout: workoutCopy,
-                                newAchievements: newAchievements,
-                              ),
-                            );
-                            navigator.pop();
-                          }
-                        }
-                      : null,
-                  child: const Text('FINISH'),
-                ),
-              ),
-            ],
           ),
           body: ListView(
             padding: const EdgeInsets.all(16),
@@ -654,6 +626,47 @@ class _WorkoutEditorScreenState extends State<WorkoutEditorScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
+              // Finish Workout Button
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: workoutProvider.activeWorkoutExercises.isNotEmpty
+                      ? () async {
+                          final navigator = Navigator.of(context);
+                          final workoutCopy = workoutProvider.activeWorkout;
+                          if (workoutCopy == null) return;
+                          
+                          final newAchievements = await workoutProvider.finishWorkout();
+                          
+                          if (context.mounted) {
+                            await showDialog(
+                              context: context,
+                              builder: (context) => WorkoutSummaryDialog(
+                                workout: workoutCopy,
+                                newAchievements: newAchievements,
+                              ),
+                            );
+                            navigator.pop();
+                          }
+                        }
+                      : null,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'FINISH WORKOUT',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         );
