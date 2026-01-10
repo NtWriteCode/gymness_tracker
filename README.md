@@ -1,6 +1,6 @@
-# Gymness Tracker 🏋️‍♂️🏃‍♂️
+# Beaver Gym Tracker 🦫💪
 
-Gymness Tracker is a versatile Flutter-based fitness application designed to track both gym weightlifting and cardio sessions. It features a robust achievement system to keep you motivated.
+Beaver Gym Tracker is a versatile Flutter-based fitness application designed to track both gym weightlifting and cardio sessions. It features a robust achievement system to keep you motivated.
 
 ## ✨ Features
 
@@ -15,7 +15,7 @@ Gymness Tracker is a versatile Flutter-based fitness application designed to tra
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/user/gymness-tracker.git
+    git clone https://github.com/user/beaver-gym-tracker.git
     ```
 2.  **Install dependencies:**
     ```bash

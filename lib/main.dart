@@ -26,13 +26,13 @@ void main() async {
               workout!..updateDemographics(weight: settings.userWeightKg),
         ),
       ],
-      child: const GymnessTrackerApp(),
+      child: const BeaverGymTrackerApp(),
     ),
   );
 }
 
-class GymnessTrackerApp extends StatelessWidget {
-  const GymnessTrackerApp({super.key});
+class BeaverGymTrackerApp extends StatelessWidget {
+  const BeaverGymTrackerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class GymnessTrackerApp extends StatelessWidget {
         return Consumer<SettingsProvider>(
           builder: (context, settings, child) {
             return MaterialApp(
-              title: 'Gymness',
+              title: 'Beaver Gym Tracker',
               theme: AppTheme.getLight(
                 settings.currentTheme == AppThemeMode.dynamic ? lightDynamic : null,
               ),
@@ -103,7 +103,7 @@ class _HomeScaffoldState extends State<HomeScaffold> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gymness Tracker'),
+        title: const Text('Beaver Tracker'),
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

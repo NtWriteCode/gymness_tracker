@@ -1,6 +1,6 @@
-Gymness Tracker is your premium personal fitness companion, meticulously designed to track both gym and cardio workouts with precision and style. 
+Beaver Gym Tracker is your premium personal fitness companion, meticulously designed to track both gym and cardio workouts with precision and style. 
 
-Whether you're a powerlifter, a marathon runner, or just starting your fitness journey, Gymness Tracker provides the tools you need to succeed.
+Whether you're a powerlifter, a marathon runner, or just starting your fitness journey, Beaver Gym Tracker provides the tools you need to succeed.
 
 ### 🚀 Key Features:
 - **Comprehensive Tracking:** Log gym exercises with sets, reps, and weights. Track cardio sessions with distance, duration, and pace.
@@ -17,4 +17,4 @@ Whether you're a powerlifter, a marathon runner, or just starting your fitness j
 - **Monday Motivator:** Prove your dedication by working out 4 Mondays in a row.
 - ...and many more secret challenges to discover!
 
-Level up your fitness game with Gymness Tracker – where every rep counts!
+Level up your fitness game with Beaver Gym Tracker – where every rep counts! 🦫💪
